@@ -2,9 +2,18 @@ package edu.buffalo.cse.cse486586.groupmessenger2;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * GroupMessengerProvider is a key-value table. Once again, please note that we do not implement
@@ -51,6 +60,30 @@ public class GroupMessengerProvider extends ContentProvider {
          * take a look at the code for PA1.
          */
         Log.v("insert", values.toString());
+
+        String key_val = values.getAsString("key");
+        String data = values.getAsString("value");
+
+
+        FileOutputStream outputStream;
+        try
+        {
+            if ((data != null ) && (key_val != null))
+            {
+                Log.d("venkat", "openFileOutput - Success - File: " + key_val + "data" + data);
+                outputStream = getContext().openFileOutput(key_val, Context.MODE_PRIVATE);
+                outputStream.write(data.getBytes());
+                outputStream.close();
+            }
+            else
+            {
+                Log.d("venkat","write failed due to some reason");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.e("venkat", "File write failed");
+        }
         return uri;
     }
 
@@ -81,6 +114,31 @@ public class GroupMessengerProvider extends ContentProvider {
          * http://developer.android.com/reference/android/database/MatrixCursor.html
          */
         Log.v("query", selection);
-        return null;
+        MatrixCursor mCursor = null;
+        Log.v("query", selection);
+        InputStream is = null;
+        try
+        {
+            is = getContext().openFileInput(selection);
+            InputStreamReader is_Reader = new InputStreamReader(is);
+            BufferedReader b_Reader = new BufferedReader(is_Reader);
+            String message = b_Reader.readLine();
+            mCursor = new MatrixCursor(new String[] { "key", "value"});
+            mCursor.addRow(new String []{ selection, message});
+            Log.d("venkat", message);
+            b_Reader.close();
+            is_Reader.close();
+            is.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return mCursor;
     }
 }
