@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -131,7 +132,7 @@ public class GroupMessengerActivity extends Activity {
                         Log.d("venkat", "venkat" + message + "read success");
 
                         Uri.Builder uriBuilder = new Uri.Builder();
-                        uriBuilder.authority("edu.buffalo.cse.cse486586.groupmessenger1.provider");
+                        uriBuilder.authority("edu.buffalo.cse.cse486586.groupmessenger2.provider");
                         uriBuilder.scheme("content");
                         mUri = uriBuilder.build();
 
