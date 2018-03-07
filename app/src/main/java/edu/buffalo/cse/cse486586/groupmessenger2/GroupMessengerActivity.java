@@ -54,26 +54,20 @@ public class GroupMessengerActivity extends Activity {
 
         @Override
         public int compare(QueueNode c1, QueueNode c2) {
-            if (c1.priority > c2.priority) {
+            if (c1.pid == c2.pid) {
+                if (c1.localSeq > c2.localSeq) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            }
+            else if (c1.priority > c2.priority) {
                 return 1;
             } else if (c1.priority < c2.priority) {
                 return -1;
             } else {
-                if (c1.localSeq > c2.localSeq) {
-                    return 1;
-                } else if (c1.localSeq < c2.localSeq) {
-                    return -1;
-                } else {
-                    if (c1.pid > c2.pid) {
-                        return 1;
-                    }
-                    else if (c1.pid < c2.pid) {
-                        return -1;
-                    }
-                    else {
-                        return 0;
-                    }
-                }
+                return (c1.pid - c2.pid);
             }
         }
     };
@@ -208,7 +202,6 @@ public class GroupMessengerActivity extends Activity {
                         catch (InterruptedException e){
                             e.printStackTrace();
                         }
-
                     }
                     else if(split_tokens.length == 5) {
 
@@ -394,10 +387,16 @@ public class GroupMessengerActivity extends Activity {
                 try {
                     peer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String msgFromPeer = peer.readLine();
-                    Log.d("venkat"," Message from peer :"+msgFromPeer+" peer: "+remotePort);
-                    String[] tokens = msgFromPeer.split("#");
-                    if (tokens.length >1) {
-                        CurrentMaxPriority = Math.max(CurrentMaxPriority, Integer.parseInt(tokens[1]));
+                    if (msgFromPeer != null) {
+                        Log.d("venkat", " Message from peer :" + msgFromPeer + " peer: " + remotePort);
+                        String[] tokens = msgFromPeer.split("#");
+                        if (tokens.length > 1) {
+                            CurrentMaxPriority = Math.max(CurrentMaxPriority, Integer.parseInt(tokens[1]));
+                        }
+                    }
+                    else
+                    {
+                        Log.d ("venkat"," read null here ");
                     }
                 }
                 catch (IOException e) {
@@ -409,7 +408,6 @@ public class GroupMessengerActivity extends Activity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
                 try {
                     socket.close();
                 } catch (IOException e) {
@@ -475,7 +473,6 @@ public class GroupMessengerActivity extends Activity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
                 try {
                     peer_socket[i].close();
                 } catch (IOException e) {
